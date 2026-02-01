@@ -77,3 +77,4 @@ cd /Users/vabole/repos/tui-agent
 |------|---------------|
 | 2026-02-01 | Initial implementation complete. All 6 phases. App working. |
 | 2026-02-01 | Added teammate filtering (Tab), full screen mode, E2E tests fixed. |
+| 2026-02-01 | **UI Redesign** - Inspired by Claude Code's polished terminal design. Removed heavy box borders, added minimal horizontal separators, ❯ selector for tasks, multi-column inline help, spaced footer hints. Created shared theme.ts with design tokens. All E2E tests passing. |
