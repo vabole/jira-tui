@@ -8,6 +8,7 @@ interface FooterProps {
 const DEFAULT_HINTS = [
   '←/→ columns',
   '↑/↓ tasks',
+  'Tab teammate',
   'Enter open',
   't/i/b/v/d status',
   '1/2 view',

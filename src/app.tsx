@@ -6,7 +6,7 @@
  * viewing task details, and transitioning issues between workflow states.
  */
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { Box, useApp, useInput } from 'ink';
+import { Box, useApp, useInput, useStdout } from 'ink';
 import { Header } from './components/Header.js';
 import { Footer } from './components/Footer.js';
 import { Board } from './components/Board.js';
@@ -24,6 +24,8 @@ type LoadingState = 'idle' | 'loading' | 'success' | 'error';
 
 export function App() {
   const { exit } = useApp();
+  const { stdout } = useStdout();
+  const terminalHeight = stdout?.rows ?? 24;
   const [screen, setScreen] = useState<Screen>('board');
   const [view, setView] = useState<View>('my-tasks');
   const [tasks, setTasks] = useState<JiraTask[]>([]);
@@ -32,6 +34,9 @@ export function App() {
   const [transitioning, setTransitioning] = useState(false);
 
   const config = loadConfig();
+
+  // Teammate filter state (null = show all in current view)
+  const [selectedTeammateIndex, setSelectedTeammateIndex] = useState<number | null>(null);
 
   // Navigation state
   const [columnIndex, setColumnIndex] = useState(0);
@@ -43,6 +48,26 @@ export function App() {
     'DONE': 0,
   });
 
+  // Extract unique teammates from tasks
+  const teammates = useMemo(() => {
+    const seen = new Map<string, { name: string; count: number }>();
+    for (const task of tasks) {
+      if (task.assignee) {
+        const existing = seen.get(task.assignee) || { name: task.assignee, count: 0 };
+        seen.set(task.assignee, { ...existing, count: existing.count + 1 });
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) => a.name.localeCompare(b.name));
+  }, [tasks]);
+
+  const selectedTeammate = selectedTeammateIndex !== null ? teammates[selectedTeammateIndex]?.name : null;
+
+  // Filter tasks by selected teammate
+  const filteredTasks = useMemo(() => {
+    if (!selectedTeammate) return tasks;
+    return tasks.filter(task => task.assignee === selectedTeammate);
+  }, [tasks, selectedTeammate]);
+
   // Group tasks by column
   const tasksByColumn = useMemo(() => {
     const grouped: Record<StatusCategory, JiraTask[]> = {
@@ -52,13 +77,13 @@ export function App() {
       'IN REVIEW': [],
       'DONE': [],
     };
-    for (const task of tasks) {
+    for (const task of filteredTasks) {
       if (grouped[task.status]) {
         grouped[task.status].push(task);
       }
     }
     return grouped;
-  }, [tasks]);
+  }, [filteredTasks]);
 
   const currentColumn = COLUMNS[columnIndex];
   const currentTaskIndex = taskIndices[currentColumn];
@@ -150,14 +175,44 @@ export function App() {
     }
 
     if (screen === 'board') {
-      // Arrow key navigation
-      if (key.leftArrow) {
+      // Tab/Shift+Tab: Cycle through teammates
+      if (key.tab && teammates.length > 0) {
+        if (key.shift) {
+          // Shift+Tab: Previous teammate
+          if (selectedTeammateIndex === null) {
+            setSelectedTeammateIndex(teammates.length - 1);
+            logger.nav('teammate selected', { teammate: teammates[teammates.length - 1].name });
+          } else if (selectedTeammateIndex > 0) {
+            setSelectedTeammateIndex(selectedTeammateIndex - 1);
+            logger.nav('teammate previous', { teammate: teammates[selectedTeammateIndex - 1].name });
+          } else {
+            setSelectedTeammateIndex(null);
+            logger.nav('teammate cleared', {});
+          }
+        } else {
+          // Tab: Next teammate
+          if (selectedTeammateIndex === null) {
+            setSelectedTeammateIndex(0);
+            logger.nav('teammate selected', { teammate: teammates[0].name });
+          } else if (selectedTeammateIndex < teammates.length - 1) {
+            setSelectedTeammateIndex(selectedTeammateIndex + 1);
+            logger.nav('teammate next', { teammate: teammates[selectedTeammateIndex + 1].name });
+          } else {
+            setSelectedTeammateIndex(null);
+            logger.nav('teammate cleared', {});
+          }
+        }
+        return;
+      }
+
+      // Arrow key navigation (without shift)
+      if (key.leftArrow && !key.shift) {
         const newIndex = Math.max(0, columnIndex - 1);
         if (newIndex !== columnIndex) {
           setColumnIndex(newIndex);
           logger.nav('moved left', { column: newIndex, columnName: COLUMNS[newIndex] });
         }
-      } else if (key.rightArrow) {
+      } else if (key.rightArrow && !key.shift) {
         const newIndex = Math.min(COLUMNS.length - 1, columnIndex + 1);
         if (newIndex !== columnIndex) {
           setColumnIndex(newIndex);
@@ -186,9 +241,11 @@ export function App() {
       // View switching
       if (input === '1' && view !== 'my-tasks') {
         setView('my-tasks');
+        setSelectedTeammateIndex(null); // Reset teammate filter
         logger.nav('switched view', { view: 'my-tasks' });
       } else if (input === '2' && view !== 'everyone') {
         setView('everyone');
+        setSelectedTeammateIndex(null); // Reset teammate filter
         logger.nav('switched view', { view: 'everyone' });
       }
 
@@ -239,13 +296,15 @@ export function App() {
       return <TaskDetail task={currentTask} />;
     }
 
-    return <Board tasks={tasks} columnIndex={columnIndex} taskIndices={taskIndices} />;
+    return <Board tasks={filteredTasks} columnIndex={columnIndex} taskIndices={taskIndices} />;
   };
 
   return (
-    <Box flexDirection="column" width="100%">
-      <Header title="Jira TUI" view={view} />
-      {renderContent()}
+    <Box flexDirection="column" width="100%" height={terminalHeight}>
+      <Header title="Jira TUI" view={view} selectedTeammate={selectedTeammate} />
+      <Box flexDirection="column" flexGrow={1}>
+        {renderContent()}
+      </Box>
       <Footer />
     </Box>
   );
