@@ -128,8 +128,6 @@ jira-tui/
 │   │   ├── Footer.tsx       # Keyboard hints
 │   │   ├── Help.tsx         # Help overlay
 │   │   └── Loading.tsx      # Loading states
-│   ├── hooks/
-│   │   └── useJira.ts       # Data fetching
 │   └── utils/
 │       ├── logger.ts        # Agent logging
 │       └── config.ts        # Config loader

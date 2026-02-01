@@ -14,17 +14,8 @@ const TYPE_ICONS: Record<string, string> = {
   'Sub-task': '-',
 };
 
-const PRIORITY_COLORS: Record<string, string> = {
-  Highest: 'red',
-  High: 'yellow',
-  Medium: 'white',
-  Low: 'blue',
-  Lowest: 'gray',
-};
-
 export function TaskCard({ task, isSelected }: TaskCardProps) {
   const borderColor = isSelected ? 'cyan' : 'gray';
-  const bgColor = isSelected ? 'blue' : undefined;
 
   return (
     <Box

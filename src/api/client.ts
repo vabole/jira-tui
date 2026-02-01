@@ -130,6 +130,12 @@ async function jiraFetch<T>(endpoint: string, options?: RequestInit): Promise<T>
   return response.json() as Promise<T>;
 }
 
+/**
+ * Fetches all issues from the active sprint for a given board and project.
+ * @param boardId - The Jira board ID
+ * @param projectKey - The project key (e.g., "PROJ")
+ * @returns Array of tasks in the active sprint
+ */
 export async function fetchBoardIssues(boardId: string, projectKey: string): Promise<JiraTask[]> {
   logger.info(`fetching issues for board ${boardId} project ${projectKey}`);
 
@@ -161,6 +167,11 @@ export async function fetchBoardIssues(boardId: string, projectKey: string): Pro
   }));
 }
 
+/**
+ * Fetches issues assigned to the current user in the active sprint.
+ * @param projectKey - The project key (e.g., "PROJ")
+ * @returns Array of tasks assigned to the current user
+ */
 export async function fetchMyIssues(projectKey: string): Promise<JiraTask[]> {
   logger.info(`fetching my issues for project ${projectKey}`);
 
@@ -191,11 +202,20 @@ export async function fetchMyIssues(projectKey: string): Promise<JiraTask[]> {
   }));
 }
 
+/**
+ * Gets available workflow transitions for an issue.
+ * @param issueKey - The issue key (e.g., "PROJ-123")
+ */
 export async function getTransitions(issueKey: string): Promise<JiraTransition[]> {
   const data = await jiraFetch<JiraTransitionsResponse>(`/issue/${issueKey}/transitions`);
   return data.transitions;
 }
 
+/**
+ * Executes a workflow transition on an issue.
+ * @param issueKey - The issue key (e.g., "PROJ-123")
+ * @param transitionId - The transition ID from getTransitions()
+ */
 export async function transitionIssue(issueKey: string, transitionId: string): Promise<void> {
   logger.action(`transitioning ${issueKey} with transition ${transitionId}`);
 
@@ -209,6 +229,12 @@ export async function transitionIssue(issueKey: string, transitionId: string): P
   logger.info(`transition complete for ${issueKey}`);
 }
 
+/**
+ * Finds a transition ID that moves an issue to the target status category.
+ * @param issueKey - The issue key (e.g., "PROJ-123")
+ * @param targetStatus - The target status category
+ * @returns The transition ID, or null if no valid transition exists
+ */
 export async function findTransitionToStatus(issueKey: string, targetStatus: StatusCategory): Promise<string | null> {
   const transitions = await getTransitions(issueKey);
 

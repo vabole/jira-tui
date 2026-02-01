@@ -1,3 +1,10 @@
+/**
+ * Main application component for Jira TUI.
+ *
+ * Renders a terminal-based Kanban board with keyboard navigation.
+ * Supports viewing tasks by assignee, navigating between columns and tasks,
+ * viewing task details, and transitioning issues between workflow states.
+ */
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { Box, useApp, useInput } from 'ink';
 import { Header } from './components/Header.js';
