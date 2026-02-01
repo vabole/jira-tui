@@ -1,19 +1,42 @@
-import { config } from 'dotenv';
 import { resolve } from 'path';
 import { homedir } from 'os';
+import { existsSync, readFileSync } from 'fs';
 import type { JiraTask, StatusCategory } from './types.js';
 import { logger } from '../utils/logger.js';
 
-// Load .env from home directory
-config({ path: resolve(homedir(), '.env') });
+// Load .env from home directory (manually to avoid dotenv noise)
+function loadEnv() {
+  const envPath = resolve(homedir(), '.env');
+  if (!existsSync(envPath)) return;
+
+  const content = readFileSync(envPath, 'utf-8');
+  for (const line of content.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIndex = trimmed.indexOf('=');
+    if (eqIndex === -1) continue;
+    const key = trimmed.slice(0, eqIndex);
+    let value = trimmed.slice(eqIndex + 1);
+    // Remove quotes if present
+    if ((value.startsWith('"') && value.endsWith('"')) ||
+        (value.startsWith("'") && value.endsWith("'"))) {
+      value = value.slice(1, -1);
+    }
+    if (!process.env[key]) {
+      process.env[key] = value;
+    }
+  }
+}
+loadEnv();
 
 const JIRA_URL = process.env.JIRA_URL || process.env.JIRA_HOST;
 const JIRA_EMAIL = process.env.JIRA_EMAIL;
 const JIRA_API_TOKEN = process.env.JIRA_API_TOKEN;
 
 if (!JIRA_URL || !JIRA_EMAIL || !JIRA_API_TOKEN) {
-  logger.error('Missing Jira credentials in ~/.env');
-  logger.info('Required: JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN');
+  console.error('Missing Jira credentials in ~/.env');
+  console.error('Required: JIRA_URL, JIRA_EMAIL, JIRA_API_TOKEN');
+  process.exit(1);
 }
 
 const AUTH_HEADER = `Basic ${Buffer.from(`${JIRA_EMAIL}:${JIRA_API_TOKEN}`).toString('base64')}`;
