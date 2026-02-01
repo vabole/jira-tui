@@ -55,6 +55,14 @@ Create `~/.jira-tui/config.json`:
 bun run src/cli.tsx
 ```
 
+### Debug Mode
+
+For verbose logging (useful for automation/agents):
+
+```bash
+JIRA_TUI_DEBUG=1 bun run src/cli.tsx
+```
+
 ## Keyboard Shortcuts
 
 | Key | Action |
