@@ -5,38 +5,52 @@
 
 ## Current State
 
-**App is complete and working.** All features done:
-- Kanban board with 5 columns
-- Arrow key navigation
-- Task detail view (Enter/Esc)
-- Status transitions (t/i/b/v/d)
-- Two views: My Tasks (1) / Everyone (2)
-- **Teammate filtering (Tab/Shift+Tab)** — NEW
-- Full screen mode (alternate screen buffer like htop)
-- Help overlay (?)
-- Clean output (logs only with `JIRA_TUI_DEBUG=1`)
+**App is complete and working.** All features implemented:
 
-## Completed Feature: Enhanced View Switching
+| Feature | Keys | Description |
+|---------|------|-------------|
+| Kanban board | — | 5 columns: TO DO, IN PROGRESS, BLOCKED, IN REVIEW, DONE |
+| Navigation | ←/→/↑/↓ | Move between columns and tasks |
+| Task detail | Enter/Esc | View task info, close with Esc |
+| Status changes | t/i/b/v/d | Quick status transitions |
+| View switching | 1/2 | My Tasks / Everyone |
+| Teammate filter | Tab/Shift+Tab | Cycle through teammates, filter board |
+| Full screen | — | Alternate screen buffer (like htop) |
+| Help | ? | Keyboard shortcuts overlay |
+| Debug mode | `JIRA_TUI_DEBUG=1` | Verbose logging to stderr |
 
-**Goal**: Filter board by individual teammates, not just "My Tasks" vs "Everyone"
+## Next Feature: TBD
 
-### Implementation Phases
+No next feature is currently planned. Potential ideas:
+- Search/filter by task title
+- Quick comment on task
+- Create new task
+- Sprint view
+- Time tracking display
 
-| Phase | Task | Status |
-|-------|------|--------|
-| 1 | Extract unique assignees from fetched issues | Done |
-| 2 | Add Tab/Shift+Tab teammate cycling | Done |
-| 3 | Filter board by selected teammate | Done |
-| 4 | Update Header to show selected teammate name | Done |
-| 5 | Full screen mode (alternate screen buffer) | Done |
+---
 
-### UX Flow
+## Testing
 
-1. Press `Tab` → Cycle forward through teammates
-2. Press `Shift+Tab` → Cycle backward through teammates
-3. Board filters to show only that teammate's tasks
-4. Header shows `[2] Everyone → @Name`
-5. After last teammate, Tab clears filter (shows all)
+Run E2E tests from the `tui-agent` directory:
+
+```bash
+./jira-tui/tests/e2e/navigate-board.sh
+./jira-tui/tests/e2e/test-views.sh
+./jira-tui/tests/e2e/test-task-detail.sh
+./jira-tui/tests/e2e/test-teammate-filter.sh
+```
+
+Or test manually:
+```bash
+cd /Users/vabole/repos/tui-agent
+./iterm-tui.sh open "bun run jira-tui/src/cli.tsx"
+./iterm-tui.sh focus tui
+./iterm-tui.sh read
+./iterm-tui.sh key tab   # Cycle teammates
+./iterm-tui.sh key q     # Quit
+./iterm-tui.sh close
+```
 
 ---
 
@@ -62,4 +76,4 @@
 | Date | What Happened |
 |------|---------------|
 | 2026-02-01 | Initial implementation complete. All 6 phases. App working. |
-| 2026-02-01 | Added teammate filtering (Tab cycles through), full screen mode. |
+| 2026-02-01 | Added teammate filtering (Tab), full screen mode, E2E tests fixed. |

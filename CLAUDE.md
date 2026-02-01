@@ -7,6 +7,12 @@ Terminal Jira board for standups. Bun + Ink (React for CLI) + TypeScript.
 > - Setup/installation goes in README.md.
 > - Delete or update outdated docs - conflicting info confuses agents.
 
+## Learnings
+
+- **One source of truth** — Don't duplicate info across files. If it's in README, don't repeat it here.
+- **Delete outdated content** — Stale docs cause more confusion than missing docs.
+- **Leave code merge-ready** — No TODOs, no commented code, no broken tests.
+
 ## Your Role
 
 **Orchestrator**: Read `HANDOFF.md`, break work into tasks, spawn workers, verify, update progress.
@@ -26,7 +32,7 @@ Terminal Jira board for standups. Bun + Ink (React for CLI) + TypeScript.
 cd /Users/vabole/repos/tui-agent
 
 # Start app
-./iterm-tui.sh open "cd jira-tui && bun run src/cli.tsx"
+./iterm-tui.sh open "bun run jira-tui/src/cli.tsx"
 
 # IMPORTANT: Focus before keys
 ./iterm-tui.sh focus tui
@@ -34,6 +40,7 @@ cd /Users/vabole/repos/tui-agent
 # Interact
 ./iterm-tui.sh read
 ./iterm-tui.sh key right
+./iterm-tui.sh key tab
 ./iterm-tui.sh key q
 
 # Cleanup
@@ -42,18 +49,13 @@ cd /Users/vabole/repos/tui-agent
 
 **Debug logging:** `JIRA_TUI_DEBUG=1 bun run src/cli.tsx`
 
-Outputs to stderr for agent verification:
-```
-[JIRA-TUI] NAV: moved right column=1 columnName=IN PROGRESS
-[JIRA-TUI] ACTION: transitioning SCWI-123 to DONE
-```
-
 ## E2E Tests
 
 ```bash
 ./jira-tui/tests/e2e/navigate-board.sh
 ./jira-tui/tests/e2e/test-views.sh
 ./jira-tui/tests/e2e/test-task-detail.sh
+./jira-tui/tests/e2e/test-teammate-filter.sh
 ```
 
 ## Key Files
@@ -61,6 +63,7 @@ Outputs to stderr for agent verification:
 | File | Purpose |
 |------|---------|
 | `src/app.tsx` | Main component, ALL state lives here |
+| `src/cli.tsx` | Entry point, full screen setup |
 | `src/api/client.ts` | Jira API, STATUS_MAP for workflow mapping |
 | `HANDOFF.md` | Current state, next steps |
 | `sessions/` | Session notes |
@@ -70,6 +73,7 @@ Outputs to stderr for agent verification:
 1. **Focus first** — `./iterm-tui.sh focus tui` before sending keys
 2. **Status mapping** — Jira uses "Progress" not "In Progress", check STATUS_MAP
 3. **API endpoint** — Use `/search/jql` (POST), old `/search` returns 410
+4. **Shift+Arrow unreliable** — Use Tab for teammate cycling instead
 
 ## Session End
 
