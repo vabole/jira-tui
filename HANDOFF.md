@@ -19,6 +19,18 @@
 | Help | ? | Keyboard shortcuts overlay |
 | Debug mode | `JIRA_TUI_DEBUG=1` | Verbose logging to stderr |
 
+## Design System
+
+A shared design system was created in `src/utils/theme.ts`:
+
+- **Colors**: `COLORS.text`, `COLORS.textDim`, `COLORS.accent` (cyan), `COLORS.status.*`
+- **Symbols**: `SYMBOLS.selector` (❯), `SYMBOLS.separator` (─)
+- **Utilities**: `horizontalLine(width)` for separators
+
+Components use theme tokens for consistency. Selected items use `COLORS.accent` (cyan).
+
+---
+
 ## Next Feature: TBD
 
 No next feature is currently planned. Potential ideas:
@@ -77,4 +89,4 @@ cd /Users/vabole/repos/tui-agent
 |------|---------------|
 | 2026-02-01 | Initial implementation complete. All 6 phases. App working. |
 | 2026-02-01 | Added teammate filtering (Tab), full screen mode, E2E tests fixed. |
-| 2026-02-01 | **UI Redesign** - Inspired by Claude Code's polished terminal design. Removed heavy box borders, added minimal horizontal separators, ❯ selector for tasks, multi-column inline help, spaced footer hints. Created shared theme.ts with design tokens. All E2E tests passing. |
+| 2026-02-01 | **UI Redesign** - Inspired by Claude Code's polished terminal design. Multi-agent orchestration (4 parallel workers). Changes: minimal horizontal separators instead of box borders, multi-column inline help, spaced footer hints, shared `theme.ts` with design tokens. Selected task cards have round cyan border for visibility. All E2E tests passing. Pushed to remote. |
