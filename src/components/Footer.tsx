@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Text } from 'ink';
+import { Box, Text, useStdout } from 'ink';
+import { COLORS, horizontalLine } from '../utils/theme.js';
 
 interface FooterProps {
   hints?: string[];
@@ -10,17 +11,18 @@ const DEFAULT_HINTS = [
   '↑/↓ tasks',
   'Tab teammate',
   'Enter open',
-  't/i/b/v/d status',
-  '1/2 view',
-  'r refresh',
   '? help',
   'q quit',
 ];
 
 export function Footer({ hints = DEFAULT_HINTS }: FooterProps) {
+  const { stdout } = useStdout();
+  const width = stdout?.columns ?? 80;
+
   return (
-    <Box borderStyle="single" borderColor="gray" paddingX={1}>
-      <Text dimColor>{hints.join('  |  ')}</Text>
+    <Box flexDirection="column">
+      <Text color={COLORS.border}>{horizontalLine(width)}</Text>
+      <Text color={COLORS.textDim}>{hints.join('    ')}</Text>
     </Box>
   );
 }
