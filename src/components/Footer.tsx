@@ -4,6 +4,7 @@ import { COLORS, horizontalLine } from '../utils/theme.js';
 
 interface FooterProps {
   hints?: string[];
+  width?: number;
 }
 
 const DEFAULT_HINTS = [
@@ -15,9 +16,9 @@ const DEFAULT_HINTS = [
   'q quit',
 ];
 
-export function Footer({ hints = DEFAULT_HINTS }: FooterProps) {
+export function Footer({ hints = DEFAULT_HINTS, width: propWidth }: FooterProps) {
   const { stdout } = useStdout();
-  const width = stdout?.columns ?? 80;
+  const width = propWidth ?? stdout?.columns ?? 80;
 
   return (
     <Box flexDirection="column">

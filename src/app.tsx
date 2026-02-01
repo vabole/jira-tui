@@ -26,6 +26,7 @@ export function App() {
   const { exit } = useApp();
   const { stdout } = useStdout();
   const terminalHeight = stdout?.rows ?? 24;
+  const terminalWidth = stdout?.columns ?? 80;
   const [screen, setScreen] = useState<Screen>('board');
   const [view, setView] = useState<View>('my-tasks');
   const [tasks, setTasks] = useState<JiraTask[]>([]);
@@ -301,11 +302,11 @@ export function App() {
 
   return (
     <Box flexDirection="column" width="100%" height={terminalHeight}>
-      <Header title="Jira TUI" view={view} selectedTeammate={selectedTeammate} />
+      <Header title="Jira TUI" view={view} selectedTeammate={selectedTeammate} width={terminalWidth} />
       <Box flexDirection="column" flexGrow={1}>
         {renderContent()}
       </Box>
-      <Footer />
+      <Footer width={terminalWidth} />
     </Box>
   );
 }
