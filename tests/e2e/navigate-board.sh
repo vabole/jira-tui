@@ -49,7 +49,7 @@ fi
 sleep 0.5
 
 OUTPUT=$(./iterm-tui.sh read)
-if echo "$OUTPUT" | grep -q "Keyboard Shortcuts"; then
+if echo "$OUTPUT" | grep -q "toggle help"; then
     echo "PASS: Help screen opened"
 else
     echo "FAIL: Help screen failed"
